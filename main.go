@@ -7,7 +7,9 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/stdcopy"
 )
 
 func main() {
@@ -26,8 +28,15 @@ func main() {
 
 	resp, err := cli.ContainerCreate(ctx, &container.Config{
 		Image: "golang:latest",
-		Cmd:   []string{"sleep", "1d"},
-	}, nil, nil, "")
+		Cmd:   []string{"echo", "Hello World", "&&", "echo", "to another World"},
+	}, &container.HostConfig{
+		Mounts: []mount.Mount{
+			mount.Mount{
+				Type:   mount.TypeBind,
+				Source: "/Users/michelvocks/go/src/github.com/michelvocks/docker-build-test/gaia-docker-test",
+				Target: "/tmp",
+			}},
+	}, nil, "")
 	if err != nil {
 		panic(err)
 	}
@@ -36,7 +45,39 @@ func main() {
 		panic(err)
 	}
 
-	execID, err := cli.ContainerExecCreate(ctx, resp.ID, types.ExecConfig{Cmd: []string{"git", "clone", "https://github.com/michelvocks/gaia-docker-test"}})
+	execID, err := cli.ContainerExecCreate(ctx, resp.ID, types.ExecConfig{
+		/*Cmd: []string{
+			"go",
+			"get",
+			"-d",
+			"./...",
+		},*/
+		Cmd:        []string{"askjfhksdhjfkjshf"},
+		WorkingDir: "/tmp",
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	if err := cli.ContainerExecStart(ctx, execID.ID, types.ExecStartCheck{}); err != nil {
+		panic(err)
+	}
+
+	out, err := cli.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true})
+	if err != nil {
+		panic(err)
+	}
+
+	stdcopy.StdCopy(os.Stdout, os.Stderr, out)
+
+	execID, err = cli.ContainerExecCreate(ctx, resp.ID, types.ExecConfig{
+		Cmd: []string{
+			"go",
+			"run",
+			"main.go",
+		},
+		WorkingDir: "/tmp",
+	})
 	if err != nil {
 		panic(err)
 	}
