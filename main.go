@@ -9,12 +9,13 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
 )
 
 func main() {
 	ctx := context.Background()
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	cli, err := client.NewClientWithOpts(client.WithHost("unix:///var/run/docker.sock"))
 	if err != nil {
 		panic(err)
 	}
@@ -28,8 +29,10 @@ func main() {
 
 	resp, err := cli.ContainerCreate(ctx, &container.Config{
 		Image: "golang:latest",
-		Cmd:   []string{"sleep", "1d"},
-	}, nil, nil, "")
+		Cmd:   []string{"cat", "1d"},
+	}, &container.HostConfig{Mounts: []mount.Mount{
+		mount.Mount{Source: "/tmp/mount", Target: "/tmp/mount"},
+	}}, nil, "")
 	if err != nil {
 		panic(err)
 	}
