@@ -29,7 +29,7 @@ func main() {
 
 	resp, err := cli.ContainerCreate(ctx, &container.Config{
 		Image: "golang:latest",
-		Cmd:   []string{"cat", "1d"},
+		Cmd:   []string{"sleep", "1d"},
 	}, &container.HostConfig{Mounts: []mount.Mount{
 		mount.Mount{Source: "/tmp/mount", Target: "/tmp/mount"},
 	}}, nil, "")
