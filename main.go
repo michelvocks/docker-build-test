@@ -44,7 +44,7 @@ func main() {
 	execID, err := cli.ContainerExecCreate(ctx, resp.ID, types.ExecConfig{
 		Cmd:          []string{"git", "clone", "https://github.com/michelvocks/gaia-docker-test", "src"},
 		AttachStdout: true,
-		AttachStderr: true,
+		AttachStderr: false,
 		WorkingDir:   "/tmp",
 	})
 	if err != nil {
