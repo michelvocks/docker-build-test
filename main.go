@@ -64,7 +64,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Git Clone output: %s\n", b)
+	fmt.Printf("Git Clone outputs: %s\n", b)
 
 	execID, err = cli.ContainerExecCreate(ctx, resp.ID, types.ExecConfig{
 		Cmd: []string{
