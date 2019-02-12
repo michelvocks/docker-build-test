@@ -73,7 +73,7 @@ func main() {
 			"-d",
 			"./...",
 		},
-		AttachStdout: true,
+		AttachStdout: false,
 		AttachStderr: true,
 		WorkingDir:   "/tmp/src",
 	})
